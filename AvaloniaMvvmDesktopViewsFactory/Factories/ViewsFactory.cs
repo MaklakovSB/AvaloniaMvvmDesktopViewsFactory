@@ -1,10 +1,9 @@
-﻿using System.Collections.Concurrent;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Threading;
-using AvaloniaMvvmDesktopViewsFactory.Attributes;
 using AvaloniaMvvmDesktopViewsFactory.Interfaces;
 
 namespace AvaloniaMvvmDesktopViewsFactory.Factories
@@ -12,13 +11,13 @@ namespace AvaloniaMvvmDesktopViewsFactory.Factories
     public class ViewsFactory : IViewsFactory
     {
         private readonly IGuidProvider _guidProvider;
-        private readonly ConcurrentDictionary<Type, Type> _viewTypeCache = new();
-        private readonly Func<Type, Type?> _viewTypeResolver;
+        private readonly ConditionalWeakTable<Type, Type> _viewTypeCache = new();
+        private readonly Assembly _viewAssembly;
 
-        public ViewsFactory(IGuidProvider guidProvider, Func<Type, Type?>? viewTypeResolver = null)
+        public ViewsFactory(IGuidProvider guidProvider, Assembly viewAssembly)
         {
             _guidProvider = guidProvider;
-            _viewTypeResolver = viewTypeResolver ?? DefaultViewTypeResolver;
+            _viewAssembly = viewAssembly ?? throw new ArgumentNullException(nameof(viewAssembly));
         }
 
         public Window CreateMainView<TViewModel>(TViewModel mainViewModel)
@@ -134,13 +133,6 @@ namespace AvaloniaMvvmDesktopViewsFactory.Factories
             });
         }
 
-        public void RegisterViewType<TViewModel, TView>()
-            where TViewModel : class, IUnique
-            where TView : Window
-        {
-            _viewTypeCache[typeof(TViewModel)] = typeof(TView);
-        }
-
         private void EnsureViewModelHasUid<TViewModel>(TViewModel viewModel)
             where TViewModel : class, IUnique
         {
@@ -205,36 +197,30 @@ namespace AvaloniaMvvmDesktopViewsFactory.Factories
             return view;
         }
 
-        private static Type? DefaultViewTypeResolver(Type viewModelType)
-        {
-            var viewType = AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(a => a.GetTypes())
-                .FirstOrDefault(t =>
-                    t.GetCustomAttribute<ViewForAttribute>()?.ViewModelType == viewModelType
-                    && typeof(Window).IsAssignableFrom(t));
-
-            if (viewType != null)
-                return viewType;
-
-            viewType = Assembly.GetAssembly(viewModelType)?
-                .GetType(viewModelType.FullName!.Replace("ViewModel", "View"));
-
-            return viewType;
-        }
-
         private Type GetViewType<TViewModel>(TViewModel viewModel) where TViewModel : class
         {
             var viewModelType = viewModel.GetType();
 
-            return _viewTypeCache.GetOrAdd(viewModelType, vmType =>
+            return _viewTypeCache.GetValue(viewModelType, vmType =>
             {
-                var viewType = _viewTypeResolver(vmType);
+                // 1. Search for View in the same assembly where ViewModel is.
+                var viewName = vmType.FullName!.Replace("ViewModel", "View");
+                var viewType = _viewAssembly.GetType(viewName);
 
-                if (viewType == null || !typeof(Window).IsAssignableFrom(viewType))
+                // 2. Search for View via naming convention.
+                if (viewType == null)
                 {
-                    throw new TypeLoadException(
-                        $"View for {vmType.Name} not found. " +
-                        $"Either register mapping or follow naming convention.");
+                    var shortViewName = vmType.Name.Replace("ViewModel", "View");
+                    viewType = _viewAssembly.GetTypes()
+                        .FirstOrDefault(t => t.Name == shortViewName && typeof(Window).IsAssignableFrom(t));
+                }
+
+                if (viewType == null)
+                {
+                    throw new InvalidOperationException(
+                        $"Could not find View for {viewModelType.Name}. " +
+                        $"Make sure the View is in the assembly{_viewAssembly.FullName} " +
+                        $"And the class name follows the naming convention: 'ViewModel' -> 'View'");
                 }
 
                 return viewType;
