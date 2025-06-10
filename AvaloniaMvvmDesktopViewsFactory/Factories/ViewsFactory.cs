@@ -23,6 +23,12 @@ namespace AvaloniaMvvmDesktopViewsFactory.Factories
             _viewAssembly = viewAssembly ?? throw new ArgumentNullException(nameof(viewAssembly));
         }
 
+        /// <summary>
+        /// Creates a main view for the application.
+        /// </summary>
+        /// <typeparam name="TViewModel"></typeparam>
+        /// <param name="mainViewModel"></param>
+        /// <returns></returns>
         public Window CreateMainView<TViewModel>(TViewModel mainViewModel)
             where TViewModel : class, IUnique
         {
@@ -32,6 +38,13 @@ namespace AvaloniaMvvmDesktopViewsFactory.Factories
             return window;
         }
 
+        /// <summary>
+        /// Shows a non-modal window for the given ViewModel.
+        /// </summary>
+        /// <typeparam name="TViewModel"></typeparam>
+        /// <param name="newViewModel"></param>
+        /// <param name="location"></param>
+        /// <returns></returns>
         public async Task ShowNonModalWindowAsync<TViewModel>(
             TViewModel newViewModel,
             WindowStartupLocation location = WindowStartupLocation.CenterScreen)
@@ -46,6 +59,14 @@ namespace AvaloniaMvvmDesktopViewsFactory.Factories
             });
         }
 
+        /// <summary>
+        /// Shows a modal view for the given ViewModel.
+        /// </summary>
+        /// <typeparam name="TViewModel"></typeparam>
+        /// <param name="newViewModel"></param>
+        /// <param name="location"></param>
+        /// <param name="ownerViewModel"></param>
+        /// <returns></returns>
         public async Task ShowModalViewAsync<TViewModel>(
             TViewModel newViewModel,
             WindowStartupLocation location = WindowStartupLocation.CenterOwner,
@@ -64,6 +85,15 @@ namespace AvaloniaMvvmDesktopViewsFactory.Factories
             await Dispatcher.UIThread.InvokeAsync(() => view.ShowDialog(ownerView));
         }
 
+        /// <summary>
+        /// Shows a dialog view for the given ViewModel and returns a result.
+        /// </summary>
+        /// <typeparam name="TViewModel"></typeparam>
+        /// <typeparam name="TResult"></typeparam>
+        /// <param name="newViewModel"></param>
+        /// <param name="location"></param>
+        /// <param name="ownerViewModel"></param>
+        /// <returns></returns>
         public async Task<TResult> ShowDialogViewWithResultAsync<TViewModel, TResult>(
             TViewModel newViewModel,
             WindowStartupLocation location = WindowStartupLocation.CenterOwner,
@@ -113,12 +143,17 @@ namespace AvaloniaMvvmDesktopViewsFactory.Factories
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine($"Error during dialog cleanup: {ex}");
+                        Debug.WriteLine($"Error during dialog cleanup: {ex}.");
                     }
                 });
             }
         }
 
+        /// <summary>
+        /// Gets the current desktop application lifetime.
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException"></exception>
         private IClassicDesktopStyleApplicationLifetime GetDesktopLifetime()
         {
             if (Avalonia.Application.Current?.ApplicationLifetime
@@ -126,9 +161,15 @@ namespace AvaloniaMvvmDesktopViewsFactory.Factories
             {
                 return desktop;
             }
-            throw new InvalidOperationException("Desktop application lifetime not found");
+            throw new InvalidOperationException("Desktop application lifetime not found.");
         }
 
+        /// <summary>
+        /// Closes the view associated with the given ViewModel.
+        /// </summary>
+        /// <typeparam name="TViewModel"></typeparam>
+        /// <param name="viewModel"></param>
+        /// <returns></returns>
         public async Task<bool> CloseViewForViewModelAsync<TViewModel>(TViewModel viewModel)
             where TViewModel : class, IUnique
         {
@@ -148,6 +189,11 @@ namespace AvaloniaMvvmDesktopViewsFactory.Factories
             });
         }
 
+        /// <summary>
+        /// Ensures that the ViewModel has a unique identifier (UID).
+        /// </summary>
+        /// <typeparam name="TViewModel"></typeparam>
+        /// <param name="viewModel"></param>
         private void EnsureViewModelHasUid<TViewModel>(TViewModel viewModel)
             where TViewModel : class, IUnique
         {
@@ -157,6 +203,12 @@ namespace AvaloniaMvvmDesktopViewsFactory.Factories
             }
         }
 
+        /// <summary>
+        /// Sets up handling for disposable resources when the view is closed.
+        /// </summary>
+        /// <typeparam name="TViewModel"></typeparam>
+        /// <param name="viewModel"></param>
+        /// <param name="window"></param>
         private void SetupDisposableHandling<TViewModel>(TViewModel viewModel, Window window)
             where TViewModel : class, IUnique
         {
@@ -174,25 +226,32 @@ namespace AvaloniaMvvmDesktopViewsFactory.Factories
                         if (weakGuidProvider.TryGetTarget(out var provider))
                         {
                             provider.ReleaseGuid(vm.Uid);
-                            Debug.WriteLine($"*** Releasing Guid for {vm.GetType().Name} (UID: {vm.Uid})");
+                            Debug.WriteLine($"*** Releasing Guid for {vm.GetType().Name} (UID: {vm.Uid}).");
                         }
 
                         if (vm is IDisposable disposable)
                         {
                             disposable.Dispose();
-                            Debug.WriteLine($"*** Disposed {vm.GetType().Name} (UID: {vm.Uid})");
+                            Debug.WriteLine($"*** Disposed {vm.GetType().Name} (UID: {vm.Uid}).");
                         }
                     }
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"Error during cleanup: {ex}");
+                    Debug.WriteLine($"Error during cleanup: {ex}.");
                 }
             };
 
             window.Closed += ClosedHandler;
         }
 
+        /// <summary>
+        /// Gets the owner window for a modal view based on the provided ViewModel.
+        /// </summary>
+        /// <typeparam name="TViewModel"></typeparam>
+        /// <param name="ownerViewModel"></param>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException"></exception>
         private Window GetOwnerWindow<TViewModel>(TViewModel? ownerViewModel)
             where TViewModel : class, IUnique
         {
@@ -202,11 +261,16 @@ namespace AvaloniaMvvmDesktopViewsFactory.Factories
                 return desktop.Windows.FirstOrDefault(win =>
                     win.DataContext is IUnique ctx && ctx.Uid == ownerViewModel.Uid)
                     ?? throw new InvalidOperationException(
-                        $"Window for ViewModel {typeof(TViewModel).Name} not found");
+                        $"Window for ViewModel {typeof(TViewModel).Name} not found.");
             }
             return GetMainWindow();
         }
 
+        /// <summary>
+        /// Gets the main window of the application.
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException"></exception>
         private Window GetMainWindow()
         {
             var desktop = GetDesktopLifetime();
@@ -215,6 +279,14 @@ namespace AvaloniaMvvmDesktopViewsFactory.Factories
                 ?? throw new InvalidOperationException("MainWindow is not initialized.");
         }
 
+        /// <summary>
+        /// Creates a view for the given ViewModel with the specified startup location.
+        /// </summary>
+        /// <typeparam name="TViewModel"></typeparam>
+        /// <param name="viewModel"></param>
+        /// <param name="location"></param>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException"></exception>
         private Window CreateView<TViewModel>(
             TViewModel viewModel,
             WindowStartupLocation location)
@@ -222,20 +294,27 @@ namespace AvaloniaMvvmDesktopViewsFactory.Factories
         {
             var viewType = GetViewType(viewModel);
             var view = Activator.CreateInstance(viewType) as Window
-                ?? throw new InvalidOperationException($"Failed to create {viewType.Name}");
+                ?? throw new InvalidOperationException($"Failed to create {viewType.Name}.");
 
             view.WindowStartupLocation = location;
             view.DataContext = viewModel;
             return view;
         }
 
+        /// <summary>
+        /// Gets the view type for the given ViewModel.
+        /// </summary>
+        /// <typeparam name="TViewModel"></typeparam>
+        /// <param name="viewModel"></param>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException"></exception>
         private Type GetViewType<TViewModel>(TViewModel viewModel) where TViewModel : class
         {
             var viewModelType = viewModel.GetType();
 
             return _viewTypeCache.GetValue(viewModelType, vmType =>
             {
-                // 1. Поиск по атрибуту ViewFor
+                // 1. Search by ViewFor attribute.
                 var viewType = _viewAssembly.GetTypes()
                     .FirstOrDefault(t => typeof(Window).IsAssignableFrom(t) &&
                         t.GetCustomAttribute<ViewForAttribute>()?.ViewModelType == vmType);
@@ -245,7 +324,7 @@ namespace AvaloniaMvvmDesktopViewsFactory.Factories
                     return viewType;
                 }
 
-                // 2. Поиск по полному имени с заменой "ViewModel" на "View"
+                // 2. Search by naming convention.
                 var viewName = vmType.FullName!.Replace("ViewModel", "View");
                 viewType = _viewAssembly.GetType(viewName);
 
@@ -262,18 +341,23 @@ namespace AvaloniaMvvmDesktopViewsFactory.Factories
             });
         }
 
-
+        /// <summary>
+        /// Disposes the ViewsFactory, releasing resources.
+        /// </summary>
         public void Dispose()
         {
             if (!_disposed)
             {
-                Debug.WriteLine("Disposing ViewsFactory");
+                Debug.WriteLine("Disposing ViewsFactory.");
 
                 _disposed = true;
                 GC.SuppressFinalize(this);
             }
         }
 
+        /// <summary>
+        /// Finalizer for ViewsFactory.
+        /// </summary>
         ~ViewsFactory()
         {
             Debug.WriteLine("ViewsFactory finalized without being disposed!");

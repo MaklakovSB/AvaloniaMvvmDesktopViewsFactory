@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AvaloniaMvvmDesktopViewsFac
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AvaloniaApplicationSample", "AvaloniaApplicationSample\AvaloniaApplicationSample.csproj", "{EC98DDD4-6BF8-4A4C-9B58-AABB1531A820}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ViewsFactoryCommonTests", "ViewsFactoryCommonTests\ViewsFactoryCommonTests.csproj", "{5B0BA4A8-0A46-4263-9173-C1C6B9D17B15}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{EC98DDD4-6BF8-4A4C-9B58-AABB1531A820}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EC98DDD4-6BF8-4A4C-9B58-AABB1531A820}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EC98DDD4-6BF8-4A4C-9B58-AABB1531A820}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B0BA4A8-0A46-4263-9173-C1C6B9D17B15}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B0BA4A8-0A46-4263-9173-C1C6B9D17B15}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B0BA4A8-0A46-4263-9173-C1C6B9D17B15}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B0BA4A8-0A46-4263-9173-C1C6B9D17B15}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
