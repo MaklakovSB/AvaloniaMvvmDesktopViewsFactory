@@ -58,6 +58,7 @@ namespace AvaloniaApplicationSample
             });
 
             services.AddTransient<MainWindowViewModel>();
+            services.AddTransient<NonModalViewModel>();
         }
     }
 }

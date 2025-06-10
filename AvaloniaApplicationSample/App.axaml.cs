@@ -1,3 +1,5 @@
+using System;
+using System.Diagnostics;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
@@ -18,9 +20,21 @@ namespace AvaloniaApplicationSample
         {
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
-                var viewsService = Program.ServiceProvider.GetRequiredService<IViewsFactory>();
+                var viewsFactory = Program.ServiceProvider.GetRequiredService<IViewsFactory>();
                 var mainViewModel = Program.ServiceProvider.GetRequiredService<MainWindowViewModel>();
-                desktop.MainWindow = viewsService.CreateMainView(mainViewModel);
+                desktop.MainWindow = viewsFactory.CreateMainView(mainViewModel);
+
+                desktop.Exit += (_, _) =>
+                {
+                    Debug.WriteLine("Application exiting.");
+
+                    // TODO: Dispose of the views factory if it implements IDisposable.
+                    if (viewsFactory is IDisposable disposableFactory)
+                    {
+                        Debug.WriteLine("Disposing views factory.");
+                        disposableFactory.Dispose();
+                    }
+                };
             }
 
             base.OnFrameworkInitializationCompleted();

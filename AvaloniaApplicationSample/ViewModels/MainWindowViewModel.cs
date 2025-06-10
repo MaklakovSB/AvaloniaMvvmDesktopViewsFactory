@@ -17,6 +17,7 @@ namespace AvaloniaApplicationSample.ViewModels
         public ReactiveCommand<Unit, Unit> OpenQuestionBoxCommand { get; }
         public ReactiveCommand<Unit, Unit> OpenNonICloseableModalCommand { get; }
         public ReactiveCommand<Unit, Unit> OpenAttributeBindingViewModelCommand { get; }
+        public ReactiveCommand<Unit, Unit> OpenNonModalCommand { get; }
 
         public MainWindowViewModel(IViewsFactory viewsService)
         {
@@ -25,6 +26,7 @@ namespace AvaloniaApplicationSample.ViewModels
             OpenQuestionBoxCommand = ReactiveCommand.Create(OpenQuestionBoxCommandMethod).DisposeWith(_disposables);
             OpenNonICloseableModalCommand = ReactiveCommand.Create(OpenNonICloseableModalCommandMethod).DisposeWith(_disposables);
             OpenAttributeBindingViewModelCommand = ReactiveCommand.Create(OpenAttributeBindingViewModelCommandMethod).DisposeWith(_disposables);
+            OpenNonModalCommand = ReactiveCommand.Create(OpenNonModalCommandMethod).DisposeWith(_disposables);
         }
 
         private async void OpenQuestionBoxCommandMethod()
@@ -42,14 +44,20 @@ namespace AvaloniaApplicationSample.ViewModels
 
         private async void OpenNonICloseableModalCommandMethod()
         {
-            //var modalWindowViewModel = new ModalWindowViewModel(_viewsService);
-            //await _viewsService.ShowModalViewAsync(modalWindowViewModel);
+            var modalWindowViewModel = new ModalWindowViewModel(_viewsService);
+            await _viewsService.ShowModalViewAsync(modalWindowViewModel);
         }
 
         private async void OpenAttributeBindingViewModelCommandMethod()
         {
-            //var attributeBindingViewModel = new AttributeBindingViewModel(_viewsService);
-            //await _viewsService.ShowModalViewAsync(attributeBindingViewModel);
+            var attributeBindingViewModel = new AttributeBindingViewModel(_viewsService);
+            await _viewsService.ShowModalViewAsync(attributeBindingViewModel);
+        }
+
+        private void OpenNonModalCommandMethod()
+        {
+            var NonModalWindowViewModel = new NonModalViewModel(_viewsService);
+            _viewsService.ShowNonModalWindowAsync(NonModalWindowViewModel);
         }
 
         public void Dispose()

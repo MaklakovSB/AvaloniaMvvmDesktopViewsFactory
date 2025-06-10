@@ -24,6 +24,10 @@
                             Command="{Binding OpenAttributeBindingViewModelCommand}"/>
 
             </MenuItem>
+            <MenuItem Header="Open modal widnows">
+                <MenuItem Header="Open non modal window"
+            Command="{Binding OpenNonModalCommand}"/>
+            </MenuItem>
         </Menu>
     </Grid>
 </Window>
