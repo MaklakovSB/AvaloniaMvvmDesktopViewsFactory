@@ -4,7 +4,29 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <FileVersion>1.0.1</FileVersion>
+    <AssemblyVersion>1.0.1</AssemblyVersion>
+    <Authors>Maklakov Sergey</Authors>
+    <Version>1.0.1</Version>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Title>AvaloniaMvvmDesktopViewsFactory</Title>
+    <Copyright>Maklakov Sergey</Copyright>
+    <PackageProjectUrl>https://gitlab.com/maklakovsb/AvaloniaMvvmDesktopViewsFactory</PackageProjectUrl>
+    <RepositoryUrl>https://gitlab.com/maklakovsb/AvaloniaMvvmDesktopViewsFactory</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>[.NET 6.0][AvaloniaUI 11.0.3]; [Desktop]; [WiewsFactory]: [MVVM]; [DI]</PackageTags>
+    <PackageReleaseNotes>Release of AvaloniaMvvmDesktopViewsFactory.1.0.1.nupkg, this is the very first and raw release, but it performs its functionality minimalistically.</PackageReleaseNotes>
+    <Description>Solution for centralizing methods of managing the life cycle of views in desktop applications for the AvaloniyaUI framework. This is a layer that allows view models to not have any references to views. Implemented to support MVVM in desktop solutions. Mapping by attribute and by naming convention is implemented.</Description>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE.txt">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="11.3.0" />
