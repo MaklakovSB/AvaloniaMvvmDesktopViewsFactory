@@ -23,6 +23,11 @@ namespace AvaloniaMvvmDesktopViewsFactory.Interfaces
             TViewModel? ownerViewModel = null)
             where TViewModel : class, ICloseable<TResult>, IUnique;
 
+        Window GetMainWindow();
+
+        Window GetOwnerWindow<TViewModel>(TViewModel? ownerViewModel)
+            where TViewModel : class, IUnique;
+
         //public void RegisterViewType<TViewModel, TView>()
         //    where TViewModel : class, IUnique where TView : Window;
     }

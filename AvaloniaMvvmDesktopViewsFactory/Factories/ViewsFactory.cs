@@ -190,6 +190,40 @@ namespace AvaloniaMvvmDesktopViewsFactory.Factories
         }
 
         /// <summary>
+        /// Gets the main window of the application.
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException"></exception>
+        public Window GetMainWindow()
+        {
+            var desktop = GetDesktopLifetime();
+
+            return desktop.MainWindow
+                ?? throw new InvalidOperationException("MainWindow is not initialized.");
+        }
+
+        /// <summary>
+        /// Gets the owner window for a modal view based on the provided ViewModel.
+        /// </summary>
+        /// <typeparam name="TViewModel"></typeparam>
+        /// <param name="ownerViewModel"></param>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException"></exception>
+        public Window GetOwnerWindow<TViewModel>(TViewModel? ownerViewModel)
+            where TViewModel : class, IUnique
+        {
+            if (ownerViewModel != null)
+            {
+                var desktop = GetDesktopLifetime();
+                return desktop.Windows.FirstOrDefault(win =>
+                    win.DataContext is IUnique ctx && ctx.Uid == ownerViewModel.Uid)
+                    ?? throw new InvalidOperationException(
+                        $"Window for ViewModel {typeof(TViewModel).Name} not found.");
+            }
+            return GetMainWindow();
+        }
+
+        /// <summary>
         /// Ensures that the ViewModel has a unique identifier (UID).
         /// </summary>
         /// <typeparam name="TViewModel"></typeparam>
@@ -243,40 +277,6 @@ namespace AvaloniaMvvmDesktopViewsFactory.Factories
             };
 
             window.Closed += ClosedHandler;
-        }
-
-        /// <summary>
-        /// Gets the owner window for a modal view based on the provided ViewModel.
-        /// </summary>
-        /// <typeparam name="TViewModel"></typeparam>
-        /// <param name="ownerViewModel"></param>
-        /// <returns></returns>
-        /// <exception cref="InvalidOperationException"></exception>
-        private Window GetOwnerWindow<TViewModel>(TViewModel? ownerViewModel)
-            where TViewModel : class, IUnique
-        {
-            if (ownerViewModel != null)
-            {
-                var desktop = GetDesktopLifetime();
-                return desktop.Windows.FirstOrDefault(win =>
-                    win.DataContext is IUnique ctx && ctx.Uid == ownerViewModel.Uid)
-                    ?? throw new InvalidOperationException(
-                        $"Window for ViewModel {typeof(TViewModel).Name} not found.");
-            }
-            return GetMainWindow();
-        }
-
-        /// <summary>
-        /// Gets the main window of the application.
-        /// </summary>
-        /// <returns></returns>
-        /// <exception cref="InvalidOperationException"></exception>
-        private Window GetMainWindow()
-        {
-            var desktop = GetDesktopLifetime();
-
-            return desktop.MainWindow
-                ?? throw new InvalidOperationException("MainWindow is not initialized.");
         }
 
         /// <summary>
