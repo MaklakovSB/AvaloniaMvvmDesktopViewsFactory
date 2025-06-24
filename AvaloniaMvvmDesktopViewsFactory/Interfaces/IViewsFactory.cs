@@ -23,6 +23,9 @@ namespace AvaloniaMvvmDesktopViewsFactory.Interfaces
             TViewModel? ownerViewModel = null)
             where TViewModel : class, ICloseable<TResult>, IUnique;
 
+        public Task<bool> CloseViewForViewModelAsync<TViewModel>(TViewModel viewModel)
+            where TViewModel : class, IUnique;
+
         Window GetMainWindow();
 
         Window GetOwnerWindow<TViewModel>(TViewModel? ownerViewModel)

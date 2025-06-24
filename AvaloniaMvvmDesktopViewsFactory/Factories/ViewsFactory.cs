@@ -35,6 +35,7 @@ namespace AvaloniaMvvmDesktopViewsFactory.Factories
             EnsureViewModelHasUid(mainViewModel);
             var window = CreateView(mainViewModel, WindowStartupLocation.Manual);
             SetupDisposableHandling(mainViewModel, window);
+            Debug.WriteLine($"[{nameof(ViewsFactory)}] Created MainView for {mainViewModel.GetType().Name} (UID: {mainViewModel.Uid}).");
             return window;
         }
 
@@ -143,25 +144,10 @@ namespace AvaloniaMvvmDesktopViewsFactory.Factories
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine($"Error during dialog cleanup: {ex}.");
+                        Debug.WriteLine($"[{nameof(ViewsFactory)}] Error during dialog cleanup: {ex}.");
                     }
                 });
             }
-        }
-
-        /// <summary>
-        /// Gets the current desktop application lifetime.
-        /// </summary>
-        /// <returns></returns>
-        /// <exception cref="InvalidOperationException"></exception>
-        private IClassicDesktopStyleApplicationLifetime GetDesktopLifetime()
-        {
-            if (Avalonia.Application.Current?.ApplicationLifetime
-                is IClassicDesktopStyleApplicationLifetime desktop)
-            {
-                return desktop;
-            }
-            throw new InvalidOperationException("Desktop application lifetime not found.");
         }
 
         /// <summary>
@@ -182,6 +168,7 @@ namespace AvaloniaMvvmDesktopViewsFactory.Factories
                 if (window != null)
                 {
                     window.Close();
+                    Debug.WriteLine($"[{nameof(ViewsFactory)}] Closed View for {viewModel.GetType().Name} (UID: {viewModel.Uid}).");
                     return true;
                 }
 
@@ -199,7 +186,7 @@ namespace AvaloniaMvvmDesktopViewsFactory.Factories
             var desktop = GetDesktopLifetime();
 
             return desktop.MainWindow
-                ?? throw new InvalidOperationException("MainWindow is not initialized.");
+                ?? throw new InvalidOperationException($"[{nameof(ViewsFactory)}] MainWindow is not initialized.");
         }
 
         /// <summary>
@@ -218,9 +205,24 @@ namespace AvaloniaMvvmDesktopViewsFactory.Factories
                 return desktop.Windows.FirstOrDefault(win =>
                     win.DataContext is IUnique ctx && ctx.Uid == ownerViewModel.Uid)
                     ?? throw new InvalidOperationException(
-                        $"Window for ViewModel {typeof(TViewModel).Name} not found.");
+                        $"[{nameof(ViewsFactory)}] Window for ViewModel {typeof(TViewModel).Name} not found.");
             }
             return GetMainWindow();
+        }
+
+        /// <summary>
+        /// Gets the current desktop application lifetime.
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException"></exception>
+        private IClassicDesktopStyleApplicationLifetime GetDesktopLifetime()
+        {
+            if (Avalonia.Application.Current?.ApplicationLifetime
+                is IClassicDesktopStyleApplicationLifetime desktop)
+            {
+                return desktop;
+            }
+            throw new InvalidOperationException($"[{nameof(ViewsFactory)}] Desktop application lifetime not found.");
         }
 
         /// <summary>
@@ -260,19 +262,19 @@ namespace AvaloniaMvvmDesktopViewsFactory.Factories
                         if (weakGuidProvider.TryGetTarget(out var provider))
                         {
                             provider.ReleaseGuid(vm.Uid);
-                            Debug.WriteLine($"*** Releasing Guid for {vm.GetType().Name} (UID: {vm.Uid}).");
+                            Debug.WriteLine($"[{nameof(ViewsFactory)}] Releasing Guid for {vm.GetType().Name} (UID: {vm.Uid}).");
                         }
 
                         if (vm is IDisposable disposable)
                         {
                             disposable.Dispose();
-                            Debug.WriteLine($"*** Disposed {vm.GetType().Name} (UID: {vm.Uid}).");
+                            Debug.WriteLine($"[{nameof(ViewsFactory)}] Disposed {vm.GetType().Name} (UID: {vm.Uid}).");
                         }
                     }
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"Error during cleanup: {ex}.");
+                    Debug.WriteLine($"[{nameof(ViewsFactory)}] Error during cleanup: {ex}.");
                 }
             };
 
@@ -290,12 +292,13 @@ namespace AvaloniaMvvmDesktopViewsFactory.Factories
         private Window CreateView<TViewModel>(
             TViewModel viewModel,
             WindowStartupLocation location)
-            where TViewModel : class
+            where TViewModel : class, IUnique
         {
             var viewType = GetViewType(viewModel);
             var view = Activator.CreateInstance(viewType) as Window
-                ?? throw new InvalidOperationException($"Failed to create {viewType.Name}.");
+                ?? throw new InvalidOperationException($"[{nameof(ViewsFactory)}] Failed to create {viewType.Name}.");
 
+            Debug.WriteLine($"[{nameof(ViewsFactory)}] Creating View for {viewModel.GetType().Name} (UID: {viewModel.Uid}).");
             view.WindowStartupLocation = location;
             view.DataContext = viewModel;
             return view;
@@ -331,6 +334,7 @@ namespace AvaloniaMvvmDesktopViewsFactory.Factories
                 if (viewType == null)
                 {
                     throw new InvalidOperationException(
+                        $"[{nameof(ViewsFactory)}] " +
                         $"Could not find View for {viewModelType.Name}. " +
                         $"Make sure the View is in the assembly {_viewAssembly.FullName} " +
                         $"and either follows the naming convention (FullName with 'ViewModel' -> 'View') " +
@@ -348,7 +352,7 @@ namespace AvaloniaMvvmDesktopViewsFactory.Factories
         {
             if (!_disposed)
             {
-                Debug.WriteLine("Disposing ViewsFactory.");
+                Debug.WriteLine($"[{nameof(ViewsFactory)}] Disposing ViewsFactory.");
 
                 _disposed = true;
                 GC.SuppressFinalize(this);
@@ -360,7 +364,7 @@ namespace AvaloniaMvvmDesktopViewsFactory.Factories
         /// </summary>
         ~ViewsFactory()
         {
-            Debug.WriteLine("ViewsFactory finalized without being disposed!");
+            Debug.WriteLine($"[{nameof(ViewsFactory)}] ViewsFactory finalized without being disposed!");
             Dispose();
         }
     }
