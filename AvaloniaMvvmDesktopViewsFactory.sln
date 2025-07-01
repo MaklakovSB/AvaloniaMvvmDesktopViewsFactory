@@ -12,6 +12,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionElements", "SolutionElements", "{2CB29519-9D01-42FC-BF42-A0056C95D61B}"
 	ProjectSection(SolutionItems) = preProject
 		LICENSE.txt = LICENSE.txt
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NET8AvaloniaApplicationSample", "NET8AvaloniaApplicationSample\NET8AvaloniaApplicationSample.csproj", "{D87E7852-BD83-44B5-8ECB-0C50596104A2}"
@@ -41,5 +42,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {ACFADE71-8578-43E2-A6B1-A8268A36E340}
 	EndGlobalSection
 EndGlobal
