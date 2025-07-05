@@ -28,7 +28,7 @@ namespace NET8AvaloniaApplicationSample
                 {
                     Debug.WriteLine("Application exiting.");
 
-                    // TODO: Dispose of the views factory if it implements IDisposable.
+                    // Dispose of the views factory if it implements IDisposable.
                     if (viewsFactory is IDisposable disposableFactory)
                     {
                         Debug.WriteLine("Disposing views factory.");
