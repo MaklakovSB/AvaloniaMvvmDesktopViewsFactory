@@ -31,7 +31,7 @@ namespace NET8AvaloniaApplicationSample.ViewModels
 
         private async void OpenQuestionBoxCommandMethod()
         {
-            var questionBoxViewModel = new QuestionBoxViewModel("Ну как?", "Вопрос.");
+            var questionBoxViewModel = new QuestionBoxViewModel("Вы уверены ... ?", "Вопрос.");
             var result = await _viewsService.ShowDialogViewWithResultAsync<QuestionBoxViewModel, QuestionBoxResult>(questionBoxViewModel);
 
             if (result == QuestionBoxResult.Ok)
