@@ -205,6 +205,9 @@ Now you no longer need to hold a direct reference to a window instance in order 
 
 ---
 
+
+
+
 # AvaloniaMvvmDesktopViewsFactory (RU)
 
 ** Библиотека для построения десктопных приложений на платформе .NET с использованием фреймворка AvaloniaUI, централизованной фабрики представлений и архитектурного паттерна MVVM.**
