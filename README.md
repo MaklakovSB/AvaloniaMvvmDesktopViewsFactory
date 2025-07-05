@@ -188,7 +188,7 @@ MIT License
     }
     ```
 
-Now you no longer need to hold a direct reference to a window instance in order to open or close a view — this can be done via the factory, for example:
+7. Now you no longer need to hold a direct reference to a window instance in order to open or close a view — this can be done via the factory, for example:
     ```csharp
     var questionBoxViewModel = new QuestionBoxViewModel("Are you sure ...?", "Question");
     var result = await _viewsService.ShowDialogViewWithResultAsync<QuestionBoxViewModel, QuestionBoxResult>(questionBoxViewModel);
@@ -204,8 +204,6 @@ Now you no longer need to hold a direct reference to a window instance in order 
     You can also explore the code of the demo application or reach out to the author with a question.
 
 ---
-
-
 
 
 # AvaloniaMvvmDesktopViewsFactory (RU)
@@ -398,7 +396,7 @@ MIT License
     }
     ```
 
-Теперь для открытия и закрытия представлений вам не нужно иметь ссылку экземпляр окна, вы можете это делать через обращения к фабрике подобным образом:
+7. Теперь для открытия и закрытия представлений вам не нужно иметь ссылку экземпляр окна, вы можете это делать через обращения к фабрике подобным образом:
     ```csharp
     var questionBoxViewModel = new QuestionBoxViewModel("Вы уверены ... ?", "Вопрос.");
     var result = await _viewsService.ShowDialogViewWithResultAsync<QuestionBoxViewModel, QuestionBoxResult>(questionBoxViewModel);
