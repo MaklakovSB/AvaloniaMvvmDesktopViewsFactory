@@ -91,11 +91,11 @@ MIT License
             // Register the ViewsFactory with the service provider.
             services.AddSingleton<IViewsFactory>(provider =>
             {
+                // Initializing the view factory.
                 var guidProvider = provider.GetRequiredService<IGuidProvider>();
-
-                // Use the assembly of the MainWindowView as the view assembly.
                 var viewAssembly = typeof(MainWindowView).Assembly;
-                return new ViewsFactory(guidProvider, viewAssembly);
+                var viewModelAssembly = typeof(MainWindowViewModel).Assembly;
+                return new ViewsFactory(guidProvider, viewAssembly, viewModelAssembly);
             });
 
             // Register your ViewModels here.
@@ -299,11 +299,11 @@ MIT License
             // Register the ViewsFactory with the service provider.
             services.AddSingleton<IViewsFactory>(provider =>
             {
+                // Initializing the view factory.
                 var guidProvider = provider.GetRequiredService<IGuidProvider>();
-
-                // Use the assembly of the MainWindowView as the view assembly.
                 var viewAssembly = typeof(MainWindowView).Assembly;
-                return new ViewsFactory(guidProvider, viewAssembly);
+                var viewModelAssembly = typeof(MainWindowViewModel).Assembly;
+                return new ViewsFactory(guidProvider, viewAssembly, viewModelAssembly);
             });
 
             // Register your ViewModels here.
@@ -409,6 +409,6 @@ MIT License
     }
     ```
 
-    Вы также можете изучить код демонстрационного приложения или обратиться к автору с вопросом.
+Вы также можете изучить код демонстрационного приложения или обратиться к автору с вопросом.
 
     ---

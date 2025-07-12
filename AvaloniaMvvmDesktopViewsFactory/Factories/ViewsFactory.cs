@@ -14,13 +14,15 @@ namespace AvaloniaMvvmDesktopViewsFactory.Factories
         private readonly IGuidProvider _guidProvider;
         private readonly ConditionalWeakTable<Type, Type> _viewTypeCache = new();
         private readonly Assembly _viewAssembly;
+        private readonly Assembly _viewModelAssembly;
 
         private bool _disposed;
 
-        public ViewsFactory(IGuidProvider guidProvider, Assembly viewAssembly)
+        public ViewsFactory(IGuidProvider guidProvider, Assembly viewAssembly, Assembly viewModelAssembly)
         {
             _guidProvider = guidProvider;
             _viewAssembly = viewAssembly ?? throw new ArgumentNullException(nameof(viewAssembly));
+            _viewModelAssembly = viewModelAssembly ?? throw new ArgumentNullException(nameof(viewModelAssembly));
         }
 
         /// <summary>
@@ -315,6 +317,12 @@ namespace AvaloniaMvvmDesktopViewsFactory.Factories
         {
             var viewModelType = viewModel.GetType();
 
+            if (viewModelType.Assembly != _viewModelAssembly)
+            {
+                throw new InvalidOperationException(
+                    $"[{nameof(ViewsFactory)}] ViewModel {viewModelType.Name} is not from {_viewModelAssembly.FullName}.");
+            }
+
             return _viewTypeCache.GetValue(viewModelType, vmType =>
             {
                 // 1. Search by ViewFor attribute.
@@ -324,24 +332,30 @@ namespace AvaloniaMvvmDesktopViewsFactory.Factories
 
                 if (viewType != null)
                 {
+                    Debug.WriteLine($"[{nameof(ViewsFactory)}] Found View '{viewType.Name}' via [ViewFor].");
                     return viewType;
                 }
 
                 // 2. Search by naming convention.
-                var viewName = vmType.FullName!.Replace("ViewModel", "View");
-                viewType = _viewAssembly.GetType(viewName);
+                var viewNameSuffix = vmType.Name.Replace("ViewModel", "View");
+                var viewTypes = _viewAssembly.GetTypes()
+                    .Where(t => typeof(Window).IsAssignableFrom(t))
+                    .ToList();
 
-                if (viewType == null)
+                viewType = viewTypes.FirstOrDefault(t => t.Name.Equals(viewNameSuffix, StringComparison.Ordinal));
+
+                if (viewType != null)
                 {
-                    throw new InvalidOperationException(
-                        $"[{nameof(ViewsFactory)}] " +
-                        $"Could not find View for {viewModelType.Name}. " +
-                        $"Make sure the View is in the assembly {_viewAssembly.FullName} " +
-                        $"and either follows the naming convention (FullName with 'ViewModel' -> 'View') " +
-                        $"or is marked with [ViewFor(typeof(YourViewModel))] attribute.");
+                    Debug.WriteLine($"[{nameof(ViewsFactory)}] Found View '{viewType.Name}' via naming convention.");
+                    return viewType;
                 }
 
-                return viewType;
+                throw new InvalidOperationException(
+                    $"[{nameof(ViewsFactory)}] " +
+                    $"Could not find View for {viewModelType.Name}. " +
+                    $"Make sure the View is in the assembly {_viewAssembly.FullName} " +
+                    $"and either follows the naming convention (FullName with 'ViewModel' -> 'View') " +
+                    $"or is marked with [ViewFor(typeof(YourViewModel))] attribute.");
             });
         }
 
