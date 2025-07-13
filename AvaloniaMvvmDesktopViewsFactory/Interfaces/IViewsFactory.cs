@@ -1,9 +1,12 @@
-﻿using Avalonia.Controls;
+﻿using System.Reflection;
+using Avalonia.Controls;
 
 namespace AvaloniaMvvmDesktopViewsFactory.Interfaces
 {
     public interface IViewsFactory
     {
+        void RegisterAssemblies(Assembly viewAssembly, Assembly viewModelAssembly);
+
         public Window CreateMainView<TViewModel>(
             TViewModel viewModel) where TViewModel : class, IUnique;
 
@@ -30,8 +33,5 @@ namespace AvaloniaMvvmDesktopViewsFactory.Interfaces
 
         Window GetOwnerWindow<TViewModel>(TViewModel? ownerViewModel)
             where TViewModel : class, IUnique;
-
-        //public void RegisterViewType<TViewModel, TView>()
-        //    where TViewModel : class, IUnique where TView : Window;
     }
 }

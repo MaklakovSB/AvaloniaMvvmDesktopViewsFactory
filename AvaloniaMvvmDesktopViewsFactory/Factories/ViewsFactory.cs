@@ -13,16 +13,68 @@ namespace AvaloniaMvvmDesktopViewsFactory.Factories
     {
         private readonly IGuidProvider _guidProvider;
         private readonly ConditionalWeakTable<Type, Type> _viewTypeCache = new();
-        private readonly Assembly _viewAssembly;
-        private readonly Assembly _viewModelAssembly;
+        private readonly List<Assembly> _viewAssemblies = new List<Assembly>();
+        private readonly List<Assembly> _viewModelAssemblies = new List<Assembly>();
 
         private bool _disposed;
 
         public ViewsFactory(IGuidProvider guidProvider, Assembly viewAssembly, Assembly viewModelAssembly)
         {
             _guidProvider = guidProvider;
-            _viewAssembly = viewAssembly ?? throw new ArgumentNullException(nameof(viewAssembly));
-            _viewModelAssembly = viewModelAssembly ?? throw new ArgumentNullException(nameof(viewModelAssembly));
+            RegisterAssemblies(viewAssembly, viewModelAssembly);
+        }
+
+        /// <summary>
+        /// Registers the assemblies containing Views and ViewModels.
+        /// </summary>
+        /// <param name="viewAssembly"></param>
+        /// <param name="viewModelAssembly"></param>
+        public void RegisterAssemblies(Assembly viewAssembly, Assembly viewModelAssembly)
+        {
+            _viewAssemblies.Add(viewAssembly);
+            _viewModelAssemblies.Add(viewModelAssembly);
+
+            var viewTypes = viewAssembly.GetTypes()
+                .Where(t => typeof(Window).IsAssignableFrom(t))
+                .ToList();
+
+            var viewModelTypes = viewModelAssembly.GetTypes()
+                .Where(t => t.GetInterfaces().Contains(typeof(IUnique)))
+                .ToList();
+
+            // 1. Search by ViewFor attribute.
+            foreach (var viewType in viewTypes)
+            {
+                var attr = viewType.GetCustomAttribute<ViewForAttribute>();
+                if (attr != null && attr.ViewModelType != null)
+                {
+                    // Check if there is already a mapping.
+                    if (!_viewTypeCache.TryGetValue(attr.ViewModelType, out _))
+                    {
+                        _viewTypeCache.Add(attr.ViewModelType, viewType);
+                    }
+                    else
+                    {
+                        Debug.WriteLine($"[{nameof(ViewsFactory)}] Warning: Duplicate ViewFor mapping for {attr.ViewModelType.Name}.");
+                    }
+                }
+            }
+
+            // 2. Search by naming convention.
+            foreach (var viewModelType in viewModelTypes)
+            {
+                // Check if there is already a mapping.
+                if (_viewTypeCache.TryGetValue(viewModelType, out _))
+                    continue;
+
+                var viewName = viewModelType.Name.Replace("ViewModel", "View");
+                var viewType = viewTypes.FirstOrDefault(t => t.Name == viewName);
+
+                if (viewType != null)
+                {
+                    _viewTypeCache.Add(viewModelType, viewType);
+                }
+            }
         }
 
         /// <summary>
@@ -278,7 +330,8 @@ namespace AvaloniaMvvmDesktopViewsFactory.Factories
                 {
                     Debug.WriteLine($"[{nameof(ViewsFactory)}] Error during cleanup: {ex}.");
                 }
-            };
+            }
+            ;
 
             window.Closed += ClosedHandler;
         }
@@ -317,46 +370,25 @@ namespace AvaloniaMvvmDesktopViewsFactory.Factories
         {
             var viewModelType = viewModel.GetType();
 
-            if (viewModelType.Assembly != _viewModelAssembly)
+            if (!_viewModelAssemblies.Contains(viewModelType.Assembly))
             {
+                var registeredAssemblies = string.Join(", ", _viewModelAssemblies.Select(a => a.GetName().Name));
                 throw new InvalidOperationException(
-                    $"[{nameof(ViewsFactory)}] ViewModel {viewModelType.Name} is not from {_viewModelAssembly.FullName}.");
+                    $"[{nameof(ViewsFactory)}] ViewModel {viewModelType.Name} is not from any registered ViewModel assembly. " +
+                    $"Registered ViewModel assemblies: {registeredAssemblies}");
             }
 
-            return _viewTypeCache.GetValue(viewModelType, vmType =>
+            if (_viewTypeCache.TryGetValue(viewModelType, out var viewType))
             {
-                // 1. Search by ViewFor attribute.
-                var viewType = _viewAssembly.GetTypes()
-                    .FirstOrDefault(t => typeof(Window).IsAssignableFrom(t) &&
-                        t.GetCustomAttribute<ViewForAttribute>()?.ViewModelType == vmType);
+                return viewType;
+            }
 
-                if (viewType != null)
-                {
-                    Debug.WriteLine($"[{nameof(ViewsFactory)}] Found View '{viewType.Name}' via [ViewFor].");
-                    return viewType;
-                }
-
-                // 2. Search by naming convention.
-                var viewNameSuffix = vmType.Name.Replace("ViewModel", "View");
-                var viewTypes = _viewAssembly.GetTypes()
-                    .Where(t => typeof(Window).IsAssignableFrom(t))
-                    .ToList();
-
-                viewType = viewTypes.FirstOrDefault(t => t.Name.Equals(viewNameSuffix, StringComparison.Ordinal));
-
-                if (viewType != null)
-                {
-                    Debug.WriteLine($"[{nameof(ViewsFactory)}] Found View '{viewType.Name}' via naming convention.");
-                    return viewType;
-                }
-
-                throw new InvalidOperationException(
-                    $"[{nameof(ViewsFactory)}] " +
-                    $"Could not find View for {viewModelType.Name}. " +
-                    $"Make sure the View is in the assembly {_viewAssembly.FullName} " +
-                    $"and either follows the naming convention (FullName with 'ViewModel' -> 'View') " +
-                    $"or is marked with [ViewFor(typeof(YourViewModel))] attribute.");
-            });
+            var viewAssemblyNames = string.Join(", ", _viewAssemblies.Select(a => a.GetName().Name));
+            throw new InvalidOperationException(
+                $"[{nameof(ViewsFactory)}] Could not find View for {viewModelType.Name}. " +
+                $"Make sure the View exists in one of the registered View assemblies: {viewAssemblyNames} " +
+                $"and either follows the naming convention ('ViewModel' -> 'View') " +
+                $"or is marked with [ViewFor(typeof(YourViewModel))] attribute.");
         }
 
         /// <summary>

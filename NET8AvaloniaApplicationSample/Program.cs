@@ -51,7 +51,12 @@ namespace NET8AvaloniaApplicationSample
                 var guidProvider = provider.GetRequiredService<IGuidProvider>();
                 var viewAssembly = typeof(MainWindowView).Assembly;
                 var viewModelAssembly = typeof(MainWindowViewModel).Assembly;
-                return new ViewsFactory(guidProvider, viewAssembly, viewModelAssembly);
+                var viewsFactory = new ViewsFactory(guidProvider, viewAssembly, viewModelAssembly);
+
+                // Registering additional assemblies the Views and ViewModels.
+                //viewsFactory.RegisterAssemblies(otheViewAssembly, otheViewModelAssembly);
+
+                return viewsFactory;
             });
 
             services.AddTransient<MainWindowViewModel>();
