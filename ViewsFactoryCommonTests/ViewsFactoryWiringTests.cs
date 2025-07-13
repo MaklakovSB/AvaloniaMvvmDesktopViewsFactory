@@ -1,4 +1,4 @@
-using System.Reflection;
+п»їusing System.Reflection;
 using AvaloniaApplicationSample.ViewModels;
 using AvaloniaApplicationSample.Views;
 using AvaloniaMvvmDesktopViewsFactory.Factories;
@@ -11,6 +11,11 @@ namespace ViewsFactoryTests
     [TestFixture]
     public class ViewsFactoryWiringTests
     {
+        class DummyVm : IUnique
+        {
+            public Guid Uid { get; set; }
+        }
+
         private ViewsFactory _factory;
 
         [SetUp]
@@ -18,8 +23,11 @@ namespace ViewsFactoryTests
         {
             var services = new ServiceCollection();
             services.AddSingleton<IGuidProvider, GuidProvider>();
+
+
             var viewAssembly = typeof(MainWindowView).Assembly;
-            _factory = new ViewsFactory(new GuidProvider(), viewAssembly);
+            var viewModelAssembly = typeof(MainWindowViewModel).Assembly;
+            _factory = new ViewsFactory(new GuidProvider(), viewAssembly, viewModelAssembly);
         }
 
         [Test]
@@ -36,19 +44,26 @@ namespace ViewsFactoryTests
         [Test]
         public void GetViewType_Throws_ForUnknownViewModel()
         {
+            // 1. Arrange.
             var vm = new DummyVm();
+
+            // 2. Act - РїРѕР»СѓС‡Р°РµРј РјРµС‚РѕРґ С‡РµСЂРµР· СЂРµС„Р»РµРєСЃРёСЋ.
             var method = typeof(ViewsFactory)
                 .GetMethod("GetViewType", BindingFlags.NonPublic | BindingFlags.Instance)
-                .MakeGenericMethod(typeof(DummyVm));
+                .MakeGenericMethod(vm.GetType());
 
-            // Ожидаем, что будет выброшено исключение
+            // 3. Assert - РїСЂРѕРІРµСЂСЏРµРј РёСЃРєР»СЋС‡РµРЅРёРµ.
             var ex = Assert.Throws<TargetInvocationException>(() =>
                 method.Invoke(_factory, new object[] { vm }));
 
-            Assert.IsNotNull(ex);
-            // Проверяем, что внутреннее исключение - то, что мы ожидаем
-            Assert.IsInstanceOf<InvalidOperationException>(ex.InnerException);
-            StringAssert.Contains("Could not find View for", ex.InnerException.Message);
+            // РџСЂРѕРІРµСЂСЏРµРј С‚РёРї РІРЅСѓС‚СЂРµРЅРЅРµРіРѕ РёСЃРєР»СЋС‡РµРЅРёСЏ.
+            var innerEx = ex.InnerException;
+            Assert.IsNotNull(innerEx);
+            Assert.IsInstanceOf<InvalidOperationException>(innerEx);
+
+            // РџСЂРѕРІРµСЂСЏРµРј СЃРѕРґРµСЂР¶Р°РЅРёРµ СЃРѕРѕР±С‰РµРЅРёСЏ.
+            Assert.That(innerEx.Message, Does.Contain("not from any registered ViewModel assembly")
+                              .Or.Contains("Could not find View for"));
         }
 
         [Test]
@@ -67,11 +82,6 @@ namespace ViewsFactoryTests
         {
             Assert.DoesNotThrow(() => _factory.Dispose());
             Assert.DoesNotThrow(() => _factory.Dispose());
-        }
-
-        class DummyVm : IUnique
-        {
-            public Guid Uid { get; set; }
         }
     }
 }

@@ -47,14 +47,30 @@ namespace AvaloniaApplicationSample
             services.AddSingleton<IGuidProvider, GuidProvider>();
 
 
+            //// Register the ViewsFactory with the service provider.
+            //services.AddSingleton<IViewsFactory>(provider =>
+            //{
+            //    var guidProvider = provider.GetRequiredService<IGuidProvider>();
+
+            //    // Use the assembly of the MainWindowView as the view assembly.
+            //    var viewAssembly = typeof(MainWindowView).Assembly;
+            //    return new ViewsFactory(guidProvider, viewAssembly);
+            //});
+
+
             // Register the ViewsFactory with the service provider.
             services.AddSingleton<IViewsFactory>(provider =>
             {
+                // Initializing the view factory.
                 var guidProvider = provider.GetRequiredService<IGuidProvider>();
-
-                // Use the assembly of the MainWindowView as the view assembly.
                 var viewAssembly = typeof(MainWindowView).Assembly;
-                return new ViewsFactory(guidProvider, viewAssembly);
+                var viewModelAssembly = typeof(MainWindowViewModel).Assembly;
+                var viewsFactory = new ViewsFactory(guidProvider, viewAssembly, viewModelAssembly);
+
+                // Registering additional assemblies the Views and ViewModels.
+                //viewsFactory.RegisterAssemblies(otheViewAssembly, otheViewModelAssembly);
+
+                return viewsFactory;
             });
 
             services.AddTransient<MainWindowViewModel>();
