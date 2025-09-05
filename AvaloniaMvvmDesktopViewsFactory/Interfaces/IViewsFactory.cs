@@ -18,12 +18,12 @@ namespace AvaloniaMvvmDesktopViewsFactory.Interfaces
         public Task ShowModalViewAsync<TViewModel>(
             TViewModel viewModel,
             WindowStartupLocation location = WindowStartupLocation.CenterOwner,
-            TViewModel? ownerViewModel = null) where TViewModel : class, IUnique;
+            IUnique? ownerViewModel = null) where TViewModel : class, IUnique;
 
         public Task<TResult> ShowDialogViewWithResultAsync<TViewModel, TResult>(
             TViewModel viewModel,
             WindowStartupLocation location = WindowStartupLocation.CenterOwner,
-            TViewModel? ownerViewModel = null)
+            IUnique? ownerViewModel = null)
             where TViewModel : class, ICloseable<TResult>, IUnique;
 
         public Task<bool> CloseViewForViewModelAsync<TViewModel>(TViewModel viewModel)

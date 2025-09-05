@@ -125,7 +125,7 @@ namespace AvaloniaMvvmDesktopViewsFactory.Factories
         public async Task ShowModalViewAsync<TViewModel>(
             TViewModel newViewModel,
             WindowStartupLocation location = WindowStartupLocation.CenterOwner,
-            TViewModel? ownerViewModel = null)
+            IUnique? ownerViewModel = null)
             where TViewModel : class, IUnique
         {
             var (view, ownerView) = await Dispatcher.UIThread.InvokeAsync(() =>
@@ -152,7 +152,7 @@ namespace AvaloniaMvvmDesktopViewsFactory.Factories
         public async Task<TResult> ShowDialogViewWithResultAsync<TViewModel, TResult>(
             TViewModel newViewModel,
             WindowStartupLocation location = WindowStartupLocation.CenterOwner,
-            TViewModel? ownerViewModel = null)
+            IUnique? ownerViewModel = null)
             where TViewModel : class, ICloseable<TResult>, IUnique
         {
             var (view, ownerView) = await Dispatcher.UIThread.InvokeAsync(() =>
