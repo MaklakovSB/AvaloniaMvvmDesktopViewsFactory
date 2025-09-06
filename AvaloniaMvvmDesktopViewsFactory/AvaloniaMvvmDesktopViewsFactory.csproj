@@ -46,7 +46,7 @@ The factory now has the ability to register additional assemblies with Views and
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="11.3.0" />
+    <PackageReference Include="Avalonia" Version="11.3.5" />
   </ItemGroup>
 
 </Project>
