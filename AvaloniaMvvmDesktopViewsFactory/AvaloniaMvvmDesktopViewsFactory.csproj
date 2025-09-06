@@ -4,19 +4,19 @@
     <TargetFrameworks>net6.0;net8.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <FileVersion>1.0.5</FileVersion>
-    <AssemblyVersion>1.0.5</AssemblyVersion>
+    <FileVersion>1.0.6</FileVersion>
+    <AssemblyVersion>1.0.6</AssemblyVersion>
     <Authors>Maklakov Sergey</Authors>
-    <Version>1.0.5</Version>
+    <Version>1.0.6</Version>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Title>AvaloniaMvvmDesktopViewsFactory</Title>
     <Copyright>Maklakov Sergey</Copyright>
     <PackageProjectUrl>https://gitlab.com/maklakovsb/AvaloniaMvvmDesktopViewsFactory</PackageProjectUrl>
     <RepositoryUrl>https://gitlab.com/maklakovsb/AvaloniaMvvmDesktopViewsFactory</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageTags>[.NET 6.0 + 8.0]; [AvaloniaUI 11.0.3]; [Desktop]; [WiewsFactory]: [MVVM]; [DI]</PackageTags>
-    <PackageReleaseNotes>Release: AvaloniaMvvmDesktopViewsFactory 1.0.4
-The factory now has the ability to register additional assemblies with Views and their ViewModels.</PackageReleaseNotes>
+    <PackageTags>[.NET 8.0 ];[.NET 6.0 ];[AvaloniaUI 11.3.5];[Desktop];[WiewsFactory]:[MVVM];[DI]</PackageTags>
+    <PackageReleaseNotes>Release: AvaloniaMvvmDesktopViewsFactory 1.0.6
+For AvaloniaUI 11.3.5</PackageReleaseNotes>
     <Description>Solution for centralizing methods of managing the life cycle of views in desktop applications for the AvaloniyaUI framework. This is a layer that allows view models to not have any references to views. Implemented to support MVVM in desktop solutions. Mapping by attribute and by naming convention is implemented.</Description>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
@@ -36,6 +36,10 @@ The factory now has the ability to register additional assemblies with Views and
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0|AnyCPU'">
     <Optimize>False</Optimize>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Avalonia">
+    <AvaloniaUseCompiledBindingsByDefault>False</AvaloniaUseCompiledBindingsByDefault>
   </PropertyGroup>
 
   <ItemGroup>

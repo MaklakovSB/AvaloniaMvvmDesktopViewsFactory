@@ -29,7 +29,7 @@ View–ViewModel association is performed via the `[ViewFor]` attribute or namin
 ## Requirements
 
 - .NET 6.0 or .NET 8.0  
-- Avalonia UI 11.3.0  
+- AvaloniaUI 11.3.5  
 - Microsoft.Extensions.DependencyInjection  
 - MVVM architecture with DI container support
 
@@ -242,7 +242,7 @@ MIT License
 ## Требования
 
 - .NET 6.0 или .NET 8.0  
-- Avalonia UI 11.3.0  
+- AvaloniaUI 11.3.5  
 - Microsoft.Extensions.DependencyInjection  
 - MVVM-архитектура с поддержкой внедрения зависимостей (DI)
 
