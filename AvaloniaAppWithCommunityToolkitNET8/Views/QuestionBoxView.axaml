@@ -1,0 +1,50 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:vm="using:AvaloniaAppWithCommunityToolkitNET8.ViewModels"
+        x:Class="AvaloniaAppWithCommunityToolkitNET8.Views.QuestionBoxView"
+		x:DataType="vm:QuestionBoxViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        SizeToContent="WidthAndHeight"
+        ShowInTaskbar="False"
+        CanResize="False"
+        Title="{Binding Title}"
+        MinWidth="260"
+        MaxWidth="400"
+        d:DesignWidth="80"
+        d:DesignHeight="45"
+        mc:Ignorable="d">
+	<Grid Margin="48,16,16,16"
+          ColumnDefinitions="*,6,*"
+          RowDefinitions="Auto,Auto">
+
+		<TextBlock Text="{Binding Message}"
+                   Grid.Row="0"
+                   Grid.Column="0"
+                   Grid.ColumnSpan="3"
+                   TextWrapping="Wrap"
+                   HorizontalAlignment="Stretch"
+                   VerticalAlignment="Top"/>
+
+		<StackPanel Grid.Row="1"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="3"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right">
+
+			<Button Classes="accent_color_button"
+                    Height="32"
+                    Margin="0,16,0,0"
+                    Content="Ок"
+                    Command="{Binding OkCommand}"/>
+
+			<Button Classes="accent_color_button"
+                    Height="32"
+                    Margin="6,16,0,0"
+                    Content="Отмена"
+                    Command="{Binding CancelCommand}"/>
+
+		</StackPanel>
+	</Grid>
+</Window>

@@ -22,7 +22,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AvaloniaApplicationSample\AvaloniaApplicationSample.csproj" />
     <ProjectReference Include="..\AvaloniaMvvmDesktopViewsFactory\AvaloniaMvvmDesktopViewsFactory.csproj" />
   </ItemGroup>
 
