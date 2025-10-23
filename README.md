@@ -29,7 +29,7 @@ View–ViewModel association is performed via the `[ViewFor]` attribute or namin
 ## Requirements
 
 - .NET 6.0 or .NET 8.0  
-- AvaloniaUI 11.3.5  
+- AvaloniaUI 11.3.8  
 - Microsoft.Extensions.DependencyInjection  
 - MVVM architecture with DI container support
 
@@ -52,7 +52,7 @@ MIT License
    dotnet add package AvaloniaMvvmDesktopViewsFactory
    ```
 
-3. Modify the Program class as follows:
+3. If you are using the NuGet package Avaloniya.ReactiveUI, then change the Program class as follows:
     ```csharp
     internal sealed class Program
     {
@@ -109,7 +109,62 @@ MIT License
     }
     ```
 
-4. Modify the App class as follows:
+4. If you are using the NuGet package CommunityToolkit, then change the Program class as follows:
+    ```csharp
+    internal sealed class Program
+    {
+        // This is the entry point of the application for dependencies.
+        public static IServiceProvider ServiceProvider { get; private set; } = default!;
+
+        // Initialization code. Don't use any Avalonia, third-party APIs or any
+        // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
+        // yet and stuff might break.
+        [STAThread]
+        public static void Main(string[] args)
+        {
+            // Create a service collection and configure services.
+            var services = new ServiceCollection();
+            ConfigureServices(services);
+            ServiceProvider = services.BuildServiceProvider();
+
+            // Start the Avalonia application.
+            BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
+        }
+
+        // Avalonia configuration, don't remove; also used by visual designer.
+        public static AppBuilder BuildAvaloniaApp()
+            => AppBuilder.Configure<App>()
+                .UsePlatformDetect()
+                .WithInterFont()
+                .LogToTrace();
+
+        // Configures the services for dependency injection.
+        private static void ConfigureServices(IServiceCollection services)
+        {
+            services.AddSingleton<IGuidProvider, GuidProvider>();
+
+            // Register the ViewsFactory with the service provider.
+            services.AddSingleton<IViewsFactory>(provider =>
+            {
+                // Initializing the view factory.
+                var guidProvider = provider.GetRequiredService<IGuidProvider>();
+                var viewAssembly = typeof(MainWindowView).Assembly;
+                var viewModelAssembly = typeof(MainWindowViewModel).Assembly;
+                var viewsFactory = new ViewsFactory(guidProvider, viewAssembly, viewModelAssembly);
+
+                // Registering additional assemblies the Views and ViewModels.
+                //viewsFactory.RegisterAssemblies(otheViewAssembly, otheViewModelAssembly);
+
+                return viewsFactory;
+            });
+
+            // Register your ViewModels here.
+            services.AddTransient<MainWindowViewModel>();
+        }
+    }
+    ```
+
+5. Modify the App class as follows:
     ```csharp
     public partial class App : Application
     {
@@ -144,7 +199,7 @@ MIT License
     }
     ```
 
-5. Modify the ViewModelBase class as follows:
+6. If you are using the NuGet package Avaloniya.ReactiveUI, then change the ViewModelBase class as follows:
     ```csharp
     public class ViewModelBase : ReactiveObject, IUnique
     {
@@ -166,7 +221,29 @@ MIT License
     }
     ```
 
-6. Minimal working pattern for MainWindowViewModel:
+7. If you are using the NuGet package CommunityToolkit, then change the ViewModelBase class as follows:
+    ```csharp
+    internal class ViewModelBase : ObservableObject, IUnique
+    {
+        public Guid Uid
+        {
+            get => _uid;
+            set
+            {
+                if (_uid != Guid.Empty)
+                    throw new InvalidOperationException($"[{nameof(ViewModelBase)}] Uid is already assigned and cannot be changed.");
+
+                if (value == Guid.Empty)
+                    throw new ArgumentException($"[{nameof(ViewModelBase)}] Uid must not be empty.", nameof(value));
+
+                SetProperty(ref _uid, value);
+            }
+        }
+        public Guid _uid;
+    }
+    ```
+
+8. Minimal working pattern for MainWindowViewModel (If you are using the NuGet package Avaloniya.ReactiveUI.):
     ```csharp
     public class MainWindowViewModel : ViewModelBase, IDisposable
     {
@@ -185,15 +262,41 @@ MIT License
 
             // Release of all subscriptions.
             _disposables.Dispose();
-
             _isDisposed = true;
+            Debug.WriteLine($"[{nameof(MainWindowViewModel)}] The Dispose method is complete for {nameof(MainWindowViewModel)}, Guid {Uid}.");
+        }
+    }
+    ```
+9. Minimal working pattern for MainWindowViewModel (If you are using the NuGet package CommunityToolkit.):
+    ```csharp
+    internal class MainWindowViewModel : ViewModelBase, IDisposable
+    {
+        private readonly IViewsFactory _viewsService;
+        private readonly List<IDisposable> _disposables = new();
+        private bool _isDisposed;
 
+        public MainWindowViewModel(IViewsFactory viewsService)
+        {
+            _viewsService = viewsService ?? throw new ArgumentNullException(nameof(viewsService));
+        }
+
+        public void Dispose()
+        {
+            if (_isDisposed) return;
+
+            // Release of all subscriptions.
+            foreach (var disposable in _disposables)
+            {
+                disposable.Dispose();
+            }
+            _disposables.Clear();
+            _isDisposed = true;
             Debug.WriteLine($"[{nameof(MainWindowViewModel)}] The Dispose method is complete for {nameof(MainWindowViewModel)}, Guid {Uid}.");
         }
     }
     ```
 
-7. Now you no longer need to hold a direct reference to a window instance in order to open or close a view — this can be done via the factory, for example:
+10. Now you no longer need to hold a direct reference to a window instance in order to open or close a view — this can be done via the factory, for example:
     ```csharp
     var questionBoxViewModel = new QuestionBoxViewModel("Are you sure ...?", "Question");
     var result = await _viewsService.ShowDialogViewWithResultAsync<QuestionBoxViewModel, QuestionBoxResult>(questionBoxViewModel);
@@ -242,7 +345,7 @@ MIT License
 ## Требования
 
 - .NET 6.0 или .NET 8.0  
-- AvaloniaUI 11.3.5  
+- AvaloniaUI 11.3.8  
 - Microsoft.Extensions.DependencyInjection  
 - MVVM-архитектура с поддержкой внедрения зависимостей (DI)
 
@@ -265,7 +368,7 @@ MIT License
    dotnet add package AvaloniaMvvmDesktopViewsFactory
    ```
 
-3. Измените класс Program следующим образом:
+3. Если вы используете NuGet пакет Avalonia.ReactiveUI, то измените класс Program следующим образом:
     ```csharp
     internal sealed class Program
     {
@@ -300,6 +403,59 @@ MIT License
         {
             services.AddSingleton<IGuidProvider, GuidProvider>();
 
+            // Register the ViewsFactory with the service provider.
+            services.AddSingleton<IViewsFactory>(provider =>
+            {
+                // Initializing the view factory.
+                var guidProvider = provider.GetRequiredService<IGuidProvider>();
+                var viewAssembly = typeof(MainWindowView).Assembly;
+                var viewModelAssembly = typeof(MainWindowViewModel).Assembly;
+                var viewsFactory = new ViewsFactory(guidProvider, viewAssembly, viewModelAssembly);
+
+                // Registering additional assemblies the Views and ViewModels.
+                //viewsFactory.RegisterAssemblies(otheViewAssembly, otheViewModelAssembly);
+
+                return viewsFactory;
+            });
+
+            // Register your ViewModels here.
+            services.AddTransient<MainWindowViewModel>();
+        }
+    }
+    ```
+4. Если вы используете NuGet пакет CommunityToolkit, то измените класс Program следующим образом:
+    ```csharp
+    internal sealed class Program
+    {
+        // This is the entry point of the application for dependencies.
+        public static IServiceProvider ServiceProvider { get; private set; } = default!;
+
+        // Initialization code. Don't use any Avalonia, third-party APIs or any
+        // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
+        // yet and stuff might break.
+        [STAThread]
+        public static void Main(string[] args)
+        {
+            // Create a service collection and configure services.
+            var services = new ServiceCollection();
+            ConfigureServices(services);
+            ServiceProvider = services.BuildServiceProvider();
+
+            // Start the Avalonia application.
+            BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
+        }
+
+        // Avalonia configuration, don't remove; also used by visual designer.
+        public static AppBuilder BuildAvaloniaApp()
+            => AppBuilder.Configure<App>()
+                .UsePlatformDetect()
+                .WithInterFont()
+                .LogToTrace();
+
+        // Configures the services for dependency injection.
+        private static void ConfigureServices(IServiceCollection services)
+        {
+            services.AddSingleton<IGuidProvider, GuidProvider>();
 
             // Register the ViewsFactory with the service provider.
             services.AddSingleton<IViewsFactory>(provider =>
@@ -322,7 +478,7 @@ MIT License
     }
     ```
 
-4. Измените класс App следующим образом:
+5. Измените класс App следующим образом:
     ```csharp
     public partial class App : Application
     {
@@ -357,7 +513,7 @@ MIT License
     }
     ```
 
-5. Измените класс ViewModelBase следующим образом:
+6. Если вы используете NuGet пакет Avalonia.ReactiveUI, то измените класс ViewModelBase следующим образом:
     ```csharp
     public class ViewModelBase : ReactiveObject, IUnique
     {
@@ -378,8 +534,29 @@ MIT License
         public Guid _uid;
     }
     ```
+7. Если вы используете NuGet пакет CommunityToolkit, то измените класс ViewModelBase следующим образом:
+    ```csharp
+    internal class ViewModelBase : ObservableObject, IUnique
+    {
+        public Guid Uid
+        {
+            get => _uid;
+            set
+            {
+                if (_uid != Guid.Empty)
+                    throw new InvalidOperationException($"[{nameof(ViewModelBase)}] Uid is already assigned and cannot be changed.");
 
-6. Минимальный шаблон реализации MainWindowViewModel:
+                if (value == Guid.Empty)
+                    throw new ArgumentException($"[{nameof(ViewModelBase)}] Uid must not be empty.", nameof(value));
+
+                SetProperty(ref _uid, value);
+            }
+        }
+        public Guid _uid;
+    }
+    ```
+
+8. Минимальный шаблон реализации MainWindowViewModel (Если вы используете NuGet пакет Avaloniya.ReactiveUI.):
     ```csharp
     public class MainWindowViewModel : ViewModelBase, IDisposable
     {
@@ -398,15 +575,41 @@ MIT License
 
             // Release of all subscriptions.
             _disposables.Dispose();
-
             _isDisposed = true;
+            Debug.WriteLine($"[{nameof(MainWindowViewModel)}] The Dispose method is complete for {nameof(MainWindowViewModel)}, Guid {Uid}.");
+        }
+    }
+    ```
+9. Минимальный шаблон реализации MainWindowViewModel (Если вы используете NuGet пакет CommunityToolkit.):
+    ```csharp
+    internal class MainWindowViewModel : ViewModelBase, IDisposable
+    {
+        private readonly IViewsFactory _viewsService;
+        private readonly List<IDisposable> _disposables = new();
+        private bool _isDisposed;
 
+        public MainWindowViewModel(IViewsFactory viewsService)
+        {
+            _viewsService = viewsService ?? throw new ArgumentNullException(nameof(viewsService));
+        }
+
+        public void Dispose()
+        {
+            if (_isDisposed) return;
+
+            // Release of all subscriptions.
+            foreach (var disposable in _disposables)
+            {
+                disposable.Dispose();
+            }
+            _disposables.Clear();
+            _isDisposed = true;
             Debug.WriteLine($"[{nameof(MainWindowViewModel)}] The Dispose method is complete for {nameof(MainWindowViewModel)}, Guid {Uid}.");
         }
     }
     ```
 
-7. Теперь для открытия и закрытия представлений вам не нужно иметь ссылку экземпляр окна, вы можете это делать через обращения к фабрике подобным образом:
+10. Теперь для открытия и закрытия представлений вам не нужно иметь ссылку экземпляр окна, вы можете это делать через обращения к фабрике подобным образом:
     ```csharp
     var questionBoxViewModel = new QuestionBoxViewModel("Вы уверены ... ?", "Вопрос.");
     var result = await _viewsService.ShowDialogViewWithResultAsync<QuestionBoxViewModel, QuestionBoxResult>(questionBoxViewModel);

@@ -2,9 +2,9 @@ using Avalonia.Controls;
 
 namespace AvaloniaAppWithCommunityToolkitNET8.Views
 {
-    public partial class MainView : Window
+    public partial class MainWindowView : Window
     {
-        public MainView()
+        public MainWindowView()
         {
             InitializeComponent();
         }

@@ -1,6 +1,5 @@
 ﻿using System;
 using Avalonia;
-using Avalonia.ReactiveUI;
 using AvaloniaMvvmDesktopViewsFactory.Factories;
 using AvaloniaMvvmDesktopViewsFactory.Interfaces;
 using AvaloniaMvvmDesktopViewsFactory.Service;
@@ -35,8 +34,7 @@ namespace NET8AvaloniaApplicationSample
             => AppBuilder.Configure<App>()
                 .UsePlatformDetect()
                 .WithInterFont()
-                .LogToTrace()
-                .UseReactiveUI();
+                .LogToTrace();
 
         // Configures the services for dependency injection.
         private static void ConfigureServices(IServiceCollection services)

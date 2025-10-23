@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
-using AvaloniaApplicationSample.ViewModels;
-using AvaloniaApplicationSample.Views;
+using AvaloniaAppWithCommunityToolkitNET8.ViewModels;
+using AvaloniaAppWithCommunityToolkitNET8.Views;
 using AvaloniaMvvmDesktopViewsFactory.Factories;
 using AvaloniaMvvmDesktopViewsFactory.Interfaces;
 using AvaloniaMvvmDesktopViewsFactory.Service;
@@ -38,7 +38,8 @@ namespace ViewsFactoryTests
                 .GetMethod("GetViewType", BindingFlags.NonPublic | BindingFlags.Instance)
                 .MakeGenericMethod(typeof(MainWindowViewModel));
             var type = method.Invoke(_factory, new object[] { vm }) as Type;
-            Assert.AreEqual(typeof(MainWindowView), type);
+
+            Assert.That(type, Is.EqualTo(typeof(MainWindowView)));
         }
 
         [Test]
@@ -58,8 +59,9 @@ namespace ViewsFactoryTests
 
             // Проверяем тип внутреннего исключения.
             var innerEx = ex.InnerException;
-            Assert.IsNotNull(innerEx);
-            Assert.IsInstanceOf<InvalidOperationException>(innerEx);
+            Assert.That(innerEx, Is.Not.Null);
+            Assert.That(innerEx, Is.InstanceOf<InvalidOperationException>());
+
 
             // Проверяем содержание сообщения.
             Assert.That(innerEx.Message, Does.Contain("not from any registered ViewModel assembly")
@@ -74,7 +76,8 @@ namespace ViewsFactoryTests
                 .GetMethod("EnsureViewModelHasUid", BindingFlags.NonPublic | BindingFlags.Instance)
                 .MakeGenericMethod(typeof(MainWindowViewModel))
                 .Invoke(_factory, new object[] { vm });
-            Assert.AreNotEqual(Guid.Empty, vm.Uid);
+
+            Assert.That(Guid.Empty, Is.Not.EqualTo(vm.Uid));
         }
 
         [Test]

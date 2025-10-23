@@ -7,7 +7,7 @@ using System.Diagnostics;
 
 namespace AvaloniaAppWithCommunityToolkitNET8.ViewModels
 {
-    internal class MainViewModel : ViewModelBase, IDisposable
+    public class MainWindowViewModel : ViewModelBase, IDisposable
     {
         private readonly IViewsFactory _viewsService;
         private readonly List<IDisposable> _disposables = new();
@@ -18,7 +18,7 @@ namespace AvaloniaAppWithCommunityToolkitNET8.ViewModels
         public RelayCommand OpenAttributeBindingViewModelCommand { get; }
         public RelayCommand OpenNonModalCommand { get; }
 
-        public MainViewModel(IViewsFactory viewsService)
+        public MainWindowViewModel(IViewsFactory viewsService)
         {
             _viewsService = viewsService ?? throw new ArgumentNullException(nameof(viewsService));
 
@@ -74,7 +74,7 @@ namespace AvaloniaAppWithCommunityToolkitNET8.ViewModels
 
             _isDisposed = true;
 
-            Debug.WriteLine($"[{nameof(MainViewModel)}] The Dispose method is complete for {nameof(MainViewModel)}, Guid {Uid}.");
+            Debug.WriteLine($"[{nameof(MainWindowViewModel)}] The Dispose method is complete for {nameof(MainWindowViewModel)}, Guid {Uid}.");
         }
     }
 }

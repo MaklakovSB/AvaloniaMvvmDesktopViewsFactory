@@ -5,7 +5,7 @@ using System.Diagnostics;
 
 namespace AvaloniaAppWithCommunityToolkitNET8.ViewModels
 {
-    public class ModalWindowViewModel : ViewModelBase, IDisposable
+    internal class ModalWindowViewModel : ViewModelBase, IDisposable
     {
         private readonly IViewsFactory _viewsService;
         private readonly List<IDisposable> _disposables = new();

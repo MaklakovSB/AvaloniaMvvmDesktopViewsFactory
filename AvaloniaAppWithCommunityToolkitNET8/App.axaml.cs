@@ -32,7 +32,7 @@ namespace AvaloniaAppWithCommunityToolkitNET8
                 //};
 
                 var viewsFactory = Program.ServiceProvider.GetRequiredService<IViewsFactory>();
-                var mainViewModel = Program.ServiceProvider.GetRequiredService<MainViewModel>();
+                var mainViewModel = Program.ServiceProvider.GetRequiredService<MainWindowViewModel>();
                 desktop.MainWindow = viewsFactory.CreateMainView(mainViewModel);
             }
 

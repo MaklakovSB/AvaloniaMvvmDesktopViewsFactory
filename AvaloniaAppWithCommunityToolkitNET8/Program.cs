@@ -47,8 +47,8 @@ namespace AvaloniaAppWithCommunityToolkitNET8
             {
                 // Initializing the view factory.
                 var guidProvider = provider.GetRequiredService<IGuidProvider>();
-                var viewAssembly = typeof(MainView).Assembly;
-                var viewModelAssembly = typeof(MainViewModel).Assembly;
+                var viewAssembly = typeof(MainWindowView).Assembly;
+                var viewModelAssembly = typeof(MainWindowViewModel).Assembly;
                 var viewsFactory = new ViewsFactory(guidProvider, viewAssembly, viewModelAssembly);
 
                 // Registering additional assemblies the Views and ViewModels.
@@ -57,9 +57,8 @@ namespace AvaloniaAppWithCommunityToolkitNET8
                 return viewsFactory;
             });
 
-            services.AddTransient<MainViewModel>();
+            services.AddTransient<MainWindowViewModel>();
             services.AddTransient<NonModalViewModel>();
-
         }
     }
 }

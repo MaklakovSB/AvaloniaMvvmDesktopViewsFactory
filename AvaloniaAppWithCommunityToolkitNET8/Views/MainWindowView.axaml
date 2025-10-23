@@ -3,12 +3,12 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 		xmlns:vm="using:AvaloniaAppWithCommunityToolkitNET8.ViewModels"
-        x:Class="AvaloniaAppWithCommunityToolkitNET8.Views.MainView"
-		x:DataType="vm:MainViewModel"
+        x:Class="AvaloniaAppWithCommunityToolkitNET8.Views.MainWindowView"
+		x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"
 		d:DesignHeight="450"
 		d:DesignWidth="800"
-		Title="MainView"
+		Title="MainWindowView"
 		mc:Ignorable="d">
 
 	<Grid RowDefinitions="Auto,*">
