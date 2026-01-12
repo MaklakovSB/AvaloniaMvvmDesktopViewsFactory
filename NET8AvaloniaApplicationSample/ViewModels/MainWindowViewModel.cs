@@ -5,6 +5,7 @@ using System.Reactive;
 using System;
 using AvaloniaMvvmDesktopViewsFactory.Interfaces;
 using NET8AvaloniaApplicationSample.Enums;
+using System.Reactive.Disposables.Fluent;
 
 namespace NET8AvaloniaApplicationSample.ViewModels
 {
