@@ -4,22 +4,23 @@
     <TargetFrameworks>net6.0;net8.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <FileVersion>1.0.7</FileVersion>
-    <AssemblyVersion>1.0.7</AssemblyVersion>
+    <FileVersion>1.0.8</FileVersion>
+    <AssemblyVersion>1.0.8</AssemblyVersion>
     <Authors>Maklakov Sergey</Authors>
-    <Version>1.0.7</Version>
+    <Version>1.0.8</Version>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Title>AvaloniaMvvmDesktopViewsFactory</Title>
     <Copyright>Maklakov Sergey</Copyright>
     <PackageProjectUrl>https://gitlab.com/maklakovsb/AvaloniaMvvmDesktopViewsFactory</PackageProjectUrl>
     <RepositoryUrl>https://gitlab.com/maklakovsb/AvaloniaMvvmDesktopViewsFactory</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageTags>[.NET 8.0 ];[.NET 6.0 ];[AvaloniaUI 11.3.7];[Desktop];[WiewsFactory]:[MVVM];[DI]</PackageTags>
-    <PackageReleaseNotes>Release: AvaloniaMvvmDesktopViewsFactory 1.0.7
-For AvaloniaUI 11.3.8</PackageReleaseNotes>
+    <PackageTags>[.NET 8.0];[.NET 6.0];[AvaloniaUI 11.3.10];[Desktop];[ViewsFactory]:[MVVM];[DI]</PackageTags>
+    <PackageReleaseNotes>Release: AvaloniaMvvmDesktopViewsFactory 1.0.8
+NuGet packages have been updated: AvaloniaUI 11.3.10.</PackageReleaseNotes>
     <Description>Solution for centralizing methods of managing the life cycle of views in desktop applications for the AvaloniyaUI framework. This is a layer that allows view models to not have any references to views. Implemented to support MVVM in desktop solutions. Mapping by attribute and by naming convention is implemented.</Description>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net6.0|AnyCPU'">
@@ -40,10 +41,30 @@ For AvaloniaUI 11.3.8</PackageReleaseNotes>
 
   <PropertyGroup Label="Avalonia">
     <AvaloniaUseCompiledBindingsByDefault>False</AvaloniaUseCompiledBindingsByDefault>
+    <PackageIcon>logo-nuget-64.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <IncludeSymbols>True</IncludeSymbols>
+    <SymbolPackageFormat>symbols.nupkg</SymbolPackageFormat>
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Assets\logo-nuget-64.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\logo-nuget-64.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="..\LICENSE.txt">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\README.md">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
